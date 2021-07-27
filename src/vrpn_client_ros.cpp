@@ -31,9 +31,9 @@
 
 #include "vrpn_client_ros/vrpn_client_ros.h"
 
-#include "tf2/LinearMath/Quaternion.h"
-#include "tf2/LinearMath/Matrix3x3.h"
-#include "tf2_ros/transform_broadcaster.h"
+// #include "tf2/LinearMath/Quaternion.h"
+// #include "tf2/LinearMath/Matrix3x3.h"
+// #include "tf2_ros/transform_broadcaster.h"
 
 #include "rclcpp/logging.hpp"
 
@@ -41,7 +41,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <chrono>
-
+#include <string>
 namespace
 {
   std::unordered_set<std::string> name_blacklist_({"VRPN Control"});
@@ -96,7 +96,7 @@ namespace vrpn_client_ros
 
   void VrpnTrackerRos::init(std::string tracker_name, rclcpp::Node::SharedPtr nh, bool create_mainloop_timer)
   {
-    RCLCPP_INFO_STREAM(nh->get_logger(), "Creating new tracker " << tracker_name);
+    RCLCPP_INFO_ONCE(nh->get_logger(), std::string("Creating new tracker ") + tracker_name);
 
     tracker_remote_->register_change_handler(this, &VrpnTrackerRos::handle_pose);
     // tracker_remote_->register_change_handler(this, &VrpnTrackerRos::handle_twist);
@@ -131,7 +131,7 @@ namespace vrpn_client_ros
 
   VrpnTrackerRos::~VrpnTrackerRos()
   {
-    RCLCPP_INFO_STREAM(output_nh_->get_logger(), "Destroying tracker " << tracker_name);
+    RCLCPP_INFO_ONCE(output_nh_->get_logger(), std::string("Destroying tracker ") + tracker_name);
     tracker_remote_->unregister_change_handler(this, &VrpnTrackerRos::handle_pose);
     // tracker_remote_->unregister_change_handler(this, &VrpnTrackerRos::handle_twist);
     // tracker_remote_->unregister_change_handler(this, &VrpnTrackerRos::handle_accel);
@@ -349,7 +349,7 @@ namespace vrpn_client_ros
 
     host_ = getHostStringFromParams(private_nh);
 
-    RCLCPP_INFO_STREAM(output_nh_->get_logger(), "Connecting to VRPN server at " << host_);
+    RCLCPP_INFO_ONCE(output_nh_->get_logger(), std::string("Connecting to VRPN server at ") + host_);
     connection_ = std::shared_ptr<vrpn_Connection>(vrpn_get_connection_by_name(host_.c_str()));
     RCLCPP_INFO(output_nh_->get_logger(), "Connection established");
 
@@ -416,7 +416,7 @@ namespace vrpn_client_ros
     {
       if (trackers_.count(connection_->sender_name(i)) == 0 && name_blacklist_.count(connection_->sender_name(i)) == 0)
       {
-        RCLCPP_INFO_STREAM(output_nh_->get_logger(), "Found new sender: " << connection_->sender_name(i));
+        RCLCPP_INFO_ONCE(output_nh_->get_logger(), std::string("Found new sender: ") + connection_->sender_name(i));
         trackers_.insert(std::make_pair(connection_->sender_name(i),
                                         std::make_shared<VrpnTrackerRos>(connection_->sender_name(i), connection_,
                                                                            output_nh_)));

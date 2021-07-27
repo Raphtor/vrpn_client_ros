@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   std::string tracker_name = "Test tracker";
   if (!private_nh->get_parameter("tracker_name", tracker_name))
   {
-    RCLCPP_FATAL_STREAM(nh->get_logger(), "Must provide paramter tracker_name for node " << private_nh->get_namespace());
+    RCLCPP_FATAL_ONCE(nh->get_logger(), std::string("Must provide paramter tracker_name for node ") + private_nh->get_namespace());
   }
 
   std::string host = vrpn_client_ros::VrpnClientRos::getHostStringFromParams(private_nh);
